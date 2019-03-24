@@ -1,0 +1,89 @@
+punctuation_chars = ["'", '"', ",", ".", "!", ":", ";", '#', '@']
+# lists of words to use
+positive_words = []
+with open("positive_words.txt") as pos_f:
+    for lin in pos_f:
+        if lin[0] != ';' and lin[0] != '\n':
+            positive_words.append(lin.strip())
+
+negative_words = []
+with open("negative_words.txt") as pos_f:
+    for lin in pos_f:
+        if lin[0] != ';' and lin[0] != '\n':
+            negative_words.append(lin.strip())
+
+
+def strip_punctuation(string1):
+    for word in punctuation_chars:
+        if word in string1:
+            string1 = string1.replace(word, "")
+    return string1
+
+
+def get_pos(string):
+    nopunctuation_sentences = strip_punctuation(string)
+    sentencesFromString = nopunctuation_sentences.split()
+
+    counter = 0
+
+    for word in positive_words:
+        for sentenceWord in sentencesFromString:
+            if word == sentenceWord:
+                counter = counter + 1
+
+    return abs(counter)
+
+
+def get_neg(string):
+    nopunctuation_sentences = strip_punctuation(string)
+    sentencesFromString = nopunctuation_sentences.split()
+
+    counter = 0
+
+    for word in negative_words:
+        for sentenceWord in sentencesFromString:
+            if word == sentenceWord:
+                counter = counter + 1
+
+    return abs(counter)
+
+
+# project file openning
+project_file = open("project_twitter_data.csv", "r")
+
+# resulting file openning for writting
+
+resulting_file = open("resulting_data.csv", "w")
+
+
+def writeToResultingFile(resulting_file):
+    resulting_file.write('Number of Retweets, Number of Replies, Positive Score, Negative Score, Net Score')
+    resulting_file.write('\n')
+    counter = 0
+
+    for lin in project_file:
+        lin_list = lin.strip().split(',')
+        positive = get_pos(lin_list[0])
+        negative = get_neg(lin_list[0])
+        net_score = positive - negative
+        if counter <= 1:
+            print("{},{},{},{},{} \n".format(lin_list[1], lin_list[2], positive, negative, net_score))
+            print('\n')
+            counter = counter + 1
+        if counter > 1:
+            resulting_file.write("{},{},{},{},{} \n".format(lin_list[1], lin_list[2], positive, negative, net_score))
+            # resulting_file.write('\n')
+
+    # for lin in lines_project_file:
+    #   print(lin)
+    #   print("\n")
+
+
+writeToResultingFile(resulting_file)
+resulting_file.close()
+project_file.close()
+
+
+
+
+
